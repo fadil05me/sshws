@@ -3,14 +3,24 @@ import socket
 import threading
 import sys
 import select
+import getopt
 
 # Listen
 LISTENING_ADDR = '0.0.0.0'
 LISTENING_PORT = int(sys.argv[1])
 
+# Pass
+PASS = ''
+
 # SSH server address
 SSH_SERVER_ADDR = '127.0.0.1'
 SSH_SERVER_PORT = 22  # Replace this with the actual SSH server port if it's different
+
+# CONST
+BUFLEN = 4096 * 4
+TIMEOUT = 60
+DEFAULT_HOST = '127.0.0.1:22'
+RESPONSE = 'HTTP/1.1 101 Switching Protocols\r\n\r\nContent-Length: 104857600000\r\n\r\n'
 
 class Server(threading.Thread):
     def __init__(self, host, port):
@@ -37,26 +47,23 @@ class Server(threading.Thread):
 
     def handle_websocket_handshake(self, conn, handshake):
         # Send HTTP/1.1 101 Switching Protocols
-        response = (
-            b"HTTP/1.1 101 Switching Protocols\r\n"
-            b"Upgrade: websocket\r\n"
-            b"Connection: Upgrade\r\n"
-            b"Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r\n\r\n"
-        )
-        conn.sendall(response)
+        conn.sendall(RESPONSE.encode())
+
         # Connect to SSH server
         ssh_conn = socket.create_connection((SSH_SERVER_ADDR, SSH_SERVER_PORT))
+
         # Now you can forward WebSocket communication to the SSH server
         while True:
             rlist, _, _ = select.select([conn, ssh_conn], [], [])
             for sock in rlist:
-                data = sock.recv(1024)
+                data = sock.recv(BUFLEN)
                 if not data:
                     break
                 if sock is conn:
                     ssh_conn.sendall(data)
                 else:
                     conn.sendall(data)
+
         conn.close()
         ssh_conn.close()
 
@@ -64,15 +71,43 @@ class Server(threading.Thread):
         self.running = False
         self.soc.close()
 
-def main():
+def print_usage():
+    print('Usage: proxy.py -p <port>')
+    print('       proxy.py -b <bindAddr> -p <port>')
+    print('       proxy.py -b 0.0.0.0 -p 80')
+
+def parse_args(argv):
+    global LISTENING_ADDR
+    global LISTENING_PORT
+    
+    try:
+        opts, args = getopt.getopt(argv,"hb:p:",["bind=","port="])
+    except getopt.GetoptError:
+        print_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print_usage()
+            sys.exit()
+        elif opt in ("-b", "--bind"):
+            LISTENING_ADDR = arg
+        elif opt in ("-p", "--port"):
+            LISTENING_PORT = int(arg)
+
+
+def main(host=LISTENING_ADDR, port=LISTENING_PORT):
+    print("\n:-------PythonProxy-------:\n")
+    print("Listening addr: " + LISTENING_ADDR)
+    print("Listening port: " + str(LISTENING_PORT) + "\n")
+    print(":-------------------------:\n")
     server = Server(LISTENING_ADDR, LISTENING_PORT)
     server.start()
     try:
         while True:
             pass
     except KeyboardInterrupt:
-        print("Stopping server...")
+        print('Stopping...')
         server.stop()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
