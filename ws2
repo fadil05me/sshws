@@ -1,0 +1,78 @@
+#!/usr/bin/python
+import socket
+import threading
+import sys
+import select
+
+# Listen
+LISTENING_ADDR = '0.0.0.0'
+LISTENING_PORT = int(sys.argv[1])
+
+# SSH server address
+SSH_SERVER_ADDR = '127.0.0.1'
+SSH_SERVER_PORT = 22  # Replace this with the actual SSH server port if it's different
+
+class Server(threading.Thread):
+    def __init__(self, host, port):
+        threading.Thread.__init__(self)
+        self.running = False
+        self.host = host
+        self.port = port
+        self.soc = None
+
+    def run(self):
+        self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.soc.bind((self.host, self.port))
+        self.soc.listen(1)
+        self.running = True
+
+        while self.running:
+            conn, addr = self.soc.accept()
+            handshake = conn.recv(1024)
+            if handshake.startswith(b"GET"):
+                self.handle_websocket_handshake(conn, handshake)
+            else:
+                conn.close()
+
+    def handle_websocket_handshake(self, conn, handshake):
+        # Send HTTP/1.1 101 Switching Protocols
+        response = (
+            b"HTTP/1.1 101 Switching Protocols\r\n"
+            b"Upgrade: websocket\r\n"
+            b"Connection: Upgrade\r\n"
+            b"Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r\n\r\n"
+        )
+        conn.sendall(response)
+        # Connect to SSH server
+        ssh_conn = socket.create_connection((SSH_SERVER_ADDR, SSH_SERVER_PORT))
+        # Now you can forward WebSocket communication to the SSH server
+        while True:
+            rlist, _, _ = select.select([conn, ssh_conn], [], [])
+            for sock in rlist:
+                data = sock.recv(1024)
+                if not data:
+                    break
+                if sock is conn:
+                    ssh_conn.sendall(data)
+                else:
+                    conn.sendall(data)
+        conn.close()
+        ssh_conn.close()
+
+    def stop(self):
+        self.running = False
+        self.soc.close()
+
+def main():
+    server = Server(LISTENING_ADDR, LISTENING_PORT)
+    server.start()
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        print("Stopping server...")
+        server.stop()
+
+if __name__ == "__main__":
+    main()
