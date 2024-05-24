@@ -141,10 +141,10 @@ class ConnectionHandler(threading.Thread):
         except Exception as e:
             self.log += ' - error: ' + e.strerror
             self.server.printLog(self.log)
-            pass
         finally:
             self.close()
             self.server.removeConn(self)
+            pass
 
     def findHeader(self, head, header):
         aux = head.find(header + ': ')
