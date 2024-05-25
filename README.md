@@ -11,7 +11,7 @@ To install Dropbear version 2019.78 on Ubuntu, you'll need to download and compi
    Install the required dependencies for building Dropbear. These typically include build tools and libraries.
 
    ```bash
-   sudo apt install build-essential zlib1g-dev
+   sudo apt install build-essential zlib1g-dev python2
    ```
 
 3. **Download Dropbear Source Code**:
