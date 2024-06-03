@@ -183,3 +183,6 @@ sudo chmod +x /bin/badvpn
 sudo wget -O /bin/badvpn-udpgw https://raw.githubusercontent.com/powermx/badvpn/master/badvpn-udpgw;
 sudo chmod +x /bin/badvpn-udpgw
 ```
+To start: ```badvpn start```
+To stop: ```badvpn stop```
+To uninstall: ```badvpn uninstall```
