@@ -66,8 +66,8 @@ To install Dropbear version 2019.78 on Ubuntu, you'll need to download and compi
    You can then generate host keys if needed:
 
    ```bash
-   sudo dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
-   sudo dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
+   sudo dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key;
+   sudo dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key;
    ```
 
 10. **Create a Systemd Service (Optional)**:
@@ -132,13 +132,13 @@ sudo nano /etc/systemd/system/dropbear.service;
 # Install SSH WS
 
 ```
-wget https://raw.githubusercontent.com/fadil05me/sshws/main/ws.py
-sudo mv ws.py /usr/local/bin/ws
+wget https://raw.githubusercontent.com/fadil05me/sshws/main/ws.py;
+sudo mv ws.py /usr/local/bin/ws;
 ```
 
 
 ```
-sudo nano /etc/systemd/system/ws.service
+sudo nano /etc/systemd/system/ws.service;
 ```
 
 ```
@@ -161,9 +161,9 @@ WantedBy=multi-user.target
 ```
 
 ```
-sudo systemctl enable ws
-sudo systemctl start ws
-sudo systemctl status ws
+sudo systemctl enable ws;
+sudo systemctl start ws;
+sudo systemctl status ws;
 ```
 
 
@@ -203,7 +203,7 @@ sudo chmod +x /bin/badvpn
 
 ```
 sudo wget -O /bin/badvpn-udpgw https://raw.githubusercontent.com/powermx/badvpn/master/badvpn-udpgw;
-sudo chmod +x /bin/badvpn-udpgw
+sudo chmod +x /bin/badvpn-udpgw;
 ```
 To start: ```badvpn start```
 
