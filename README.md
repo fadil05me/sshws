@@ -96,7 +96,7 @@ To install Dropbear version 2019.78 on Ubuntu, you'll need to download and compi
     WantedBy=multi-user.target
 ```
 
-    Save and close the file. Then, enable and start the Dropbear service:
+Save and close the file. Then, enable and start the Dropbear service:
 
 ```
     sudo systemctl enable dropbear; sudo systemctl start dropbear;
