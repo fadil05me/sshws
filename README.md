@@ -78,12 +78,12 @@ To install Dropbear version 2019.78 on Ubuntu, you'll need to download and compi
     ```
 
       # 1 Line Install
-      ```
+```
       sudo apt update; sudo apt install -y build-essential zlib1g-dev python2; wget https://matt.ucc.asn.au/dropbear/releases/dropbear-2019.78.tar.bz2; tar xvjf dropbear-2019.78.tar.bz2; cd dropbear-2019.78; ./configure; make; sudo make install; sudo mkdir -p /etc/dropbear; sudo dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key; sudo dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key; sudo nano /etc/systemd/system/dropbear.service;
-      ```
+```
 
 /etc/systemd/system/dropbear.service
-    ```
+```
     [Unit]
     Description=Dropbear SSH server
     After=network.target
@@ -94,7 +94,7 @@ To install Dropbear version 2019.78 on Ubuntu, you'll need to download and compi
 
     [Install]
     WantedBy=multi-user.target
-    ```
+```
 
     Save and close the file. Then, enable and start the Dropbear service:
 
