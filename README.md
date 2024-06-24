@@ -151,44 +151,25 @@ sudo systemctl status ws;
 
 # INSTALL BADVPN UDPGW
 
-```
-sudo nano /bin/badvpn
-```
-
-Paste this:
-```
-#!/bin/bash
-
-if [ "$1" == "uninstall" ]; then
-    echo 'Uninstalling badvpn'
-    rm /bin/badvpn && rm /bin/badvpn-udpgw
-    echo 'Uninstall complete'
-fi
-
-if [ "$1" == "start" ]; then
-    screen -dmS bad badvpn-udpgw --listen-addr 127.0.0.1:7300 --max-clients 1000 --max-connections-for-client 1000 --client-socket-sndbuf 0 --udp-mtu 9000
-    echo 'Badvpn initialized on port 7300'
-fi
-
-if [ "$1" == "stop" ]; then
-    badvpnpid=$(ps x | grep badvpn | grep -v grep | awk '{print $1}')
-    kill -9 "$badvpnpid" >/dev/null 2>/dev/null
-    kill "$badvpnpid" >/dev/null 2>/dev/null
-    killall badvpn-udpgw
-fi
+Install docker
 
 ```
-
-```
-sudo chmod +x /bin/badvpn
+docker pull gegedesembri/badvpn;
 ```
 
+docker compose file:
 ```
-sudo wget -O /bin/badvpn-udpgw https://raw.githubusercontent.com/powermx/badvpn/master/badvpn-udpgw;
-sudo chmod +x /bin/badvpn-udpgw;
+services:
+  badvpn:
+    image: gegedesembri/badvpn
+    container_name: badvpn
+    command: badvpn-udpgw
+    ports:
+      - "7300:7300"
+    restart: always
 ```
-To start: ```badvpn start```
 
-To stop: ```badvpn stop```
-
-To uninstall: ```badvpn uninstall```
+start by:
+```
+docker compose up -d
+```
